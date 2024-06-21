@@ -107,4 +107,4 @@ ehthumbs.db
 # End of OS generated ignore
 
 # Custom Action files
-.github/actions/laravel-host/node_modules/
+*/node_modules/
