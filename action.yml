@@ -26,7 +26,7 @@ inputs:
 outputs:
   deployment-status:
     description: 'The status of the deployment'
-    value: 'success'
+    value: ${{ steps.deploy.outputs.status }}
 runs:
   using: 'composite'
   steps:
@@ -50,7 +50,7 @@ runs:
         php artisan key:generate
         cp .env.example .env
         php artisan key:generate
-        
+
     - name: Set permissions
       shell: bash
       run: |

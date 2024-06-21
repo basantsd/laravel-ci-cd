@@ -1,0 +1,23 @@
+name: Laravel CI/CD
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Laravel CI/CD Action
+      uses: basantsd/laravel-ci-cd@v1.0.0
+      with:
+        production-branch: 'production'
+        vps-host: ${{ secrets.VPS_HOST }}
+        vps-username: ${{ secrets.VPS_USERNAME }}
+        vps-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
+        deploy-path: '/var/www/remote-charting.techmavedev.com/'
+        php-version: '8.1'
