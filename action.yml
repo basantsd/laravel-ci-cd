@@ -1,6 +1,6 @@
 name: 'Laravel CI/CD Action'
 description: 'A custom GitHub Action for Laravel CI/CD'
-author: 'Your Name'
+author: 'Basant Singh Dobal (sbasant12345@gmail.com)'
 inputs:
   production-branch:
     description: 'The production branch to deploy'
@@ -74,5 +74,5 @@ runs:
           /usr/bin/php${{ inputs.php-version }} artisan optimize:clear
           /usr/bin/php${{ inputs.php-version }} artisan storage:link
 branding:
-  icon: 'zap'
-  color: 'yellow'
+  icon: 'wind'
+  color: 'blue'
