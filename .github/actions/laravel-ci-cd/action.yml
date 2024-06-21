@@ -1,0 +1,78 @@
+name: 'Laravel CI/CD Action'
+description: 'A custom GitHub Action for Laravel CI/CD'
+author: 'Your Name'
+inputs:
+  production-branch:
+    description: 'The production branch to deploy'
+    required: true
+    default: 'production'
+  vps-host:
+    description: 'VPS host'
+    required: true
+  vps-username:
+    description: 'VPS username'
+    required: true
+  vps-private-key:
+    description: 'VPS private key'
+    required: true
+  deploy-path:
+    description: 'Deployment path on the VPS'
+    required: true
+    default: '/var/www/html/express/'
+  php-version:
+    description: 'PHP version to use'
+    required: true
+    default: '8.0'
+outputs:
+  deployment-status:
+    description: 'The status of the deployment'
+    value: 'success'
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        tools: composer, php-cs-fixer
+
+    - name: Install dependencies
+      shell: bash
+      run: composer install --no-dev --prefer-dist --optimize-autoloader
+
+    - name: Prepare environment
+      shell: bash
+      run: |
+        cp .env.example .env
+        php artisan key:generate
+        cp .env.example .env
+        php artisan key:generate
+        
+    - name: Set permissions
+      shell: bash
+      run: |
+        sudo chown -R $USER:www-data storage bootstrap/cache
+        sudo chmod -R 775 storage bootstrap/cache
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ inputs.vps-host }}
+        username: ${{ inputs.vps-username }}
+        key: ${{ inputs.vps-private-key }}
+        script: |
+          cd ${{ inputs.deploy-path }}
+          sudo chown -R $USER:www-data storage/ bootstrap/cache public/
+          sudo chmod -R 775 storage bootstrap/cache public/
+          git reset --hard
+          git clean -fd
+          git pull origin ${{ inputs.production-branch }}
+          /usr/bin/php${{ inputs.php-version }} $(which composer) install --no-dev --prefer-dist --optimize-autoloader
+          /usr/bin/php${{ inputs.php-version }} artisan optimize
+          /usr/bin/php${{ inputs.php-version }} artisan optimize:clear
+          /usr/bin/php${{ inputs.php-version }} artisan storage:link
+branding:
+  icon: 'zap'
+  color: 'yellow'
