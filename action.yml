@@ -18,7 +18,7 @@ inputs:
   deploy-path:
     description: 'Deployment path on the VPS'
     required: true
-    default: '/var/www/html/express/'
+    default: '/var/www/html/project_name/'
   php-version:
     description: 'PHP version to use'
     required: true
