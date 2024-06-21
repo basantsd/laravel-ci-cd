@@ -1,0 +1,17 @@
+name: 'My Custom Action'
+description: 'A custom action to do something'
+author: 'Your Name'
+inputs:
+  my-input:
+    description: 'An example input'
+    required: true
+    default: 'default value'
+outputs:
+  my-output:
+    description: 'An example output'
+runs:
+  using: 'node12'
+  main: 'index.js'
+branding:
+  icon: 'zap'
+  color: 'yellow'
