@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Laravel CI/CD
-      uses: your-username/laravel-ci-cd-action@v1
+      uses: basantsd/laravel-ci-cd@v1
       with:
         production-branch: 'production'
         vps-host: ${{ secrets.VPS_HOST }}
