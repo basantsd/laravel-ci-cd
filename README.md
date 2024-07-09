@@ -34,7 +34,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run CI job
-        uses: basantsd/laravel-ci-cd@v2
+        uses: basantsd/laravel-ci-cd@v1.2
         with:
           job: 'ci'
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -48,7 +48,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run Code Cleanup job
-        uses: basantsd/laravel-ci-cd@v2
+        uses: basantsd/laravel-ci-cd@v1.2
         with:
           job: 'code_cleanup'
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -62,7 +62,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Run CD job
-        uses: basantsd/laravel-ci-cd@v2
+        uses: basantsd/laravel-ci-cd@v1.2
         with:
           job: 'cd'
           vps_private_key: ${{ secrets.VPS_PRIVATE_KEY }}
