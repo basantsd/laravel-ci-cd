@@ -1,7 +1,17 @@
 #!/bin/bash
 set -e
 
-job=$1
+create_github_issue() {
+  local message=$1
+  curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" \
+       -H "Accept: application/vnd.github.v3+json" \
+       https://api.github.com/repos/$REPO/issues \
+       -d "{\"title\":\"CI/CD Action Failed\",\"body\":\"$message\"}"
+}
+
+job=$JOB
+
+trap 'create_github_issue "Job: $job failed.\n\nCheck the logs for details."' ERR
 
 if [ "$job" == "ci" ]; then
   # CI steps
@@ -13,7 +23,7 @@ elif [ "$job" == "cd" ]; then
   # CD steps
   echo "Running CD steps..."
   composer install --prefer-dist --no-progress --no-suggest --no-interaction
-  ssh -o StrictHostKeyChecking=no -i $VPS_PRIVATE_KEY $VPS_USERNAME@$VPS_HOST << EOF
+  ssh -o StrictHostKeyChecking=no -i $VPS_PRIVATE_KEY $VPS_USERNAME@$VPS_HOST 
   cd $DEPLOY_PATH
   sudo chown -R $USER:www-data storage/ bootstrap/cache public/
   sudo chmod -R 775 storage bootstrap/cache public/
@@ -24,7 +34,6 @@ elif [ "$job" == "cd" ]; then
   /usr/bin/php$PHP_VERSION artisan optimize
   /usr/bin/php$PHP_VERSION artisan optimize:clear
   /usr/bin/php$PHP_VERSION artisan storage:link
-  EOF
 
 elif [ "$job" == "code_cleanup" ]; then
   # Code Cleanup steps

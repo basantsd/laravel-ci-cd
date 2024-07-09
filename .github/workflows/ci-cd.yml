@@ -1,23 +1,58 @@
-name: Laravel CI/CD
+name: Laravel CI/CD Workflow
 
 on:
   push:
     branches:
-      - production
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  ci:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Laravel CI/CD Action
-      uses: basantsd/laravel-ci-cd@v1.0.0
-      with:
-        production-branch: 'production'
-        vps-host: ${{ secrets.VPS_HOST }}
-        vps-username: ${{ secrets.VPS_USERNAME }}
-        vps-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
-        deploy-path: '/var/www/remote-charting.techmavedev.com/'
-        php-version: '8.1'
+      - name: Run CI job
+        uses: basantsd/laravel-ci-cd@v2.0.0
+        with:
+          job: 'ci'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repo: 'your-username/your-repo'
+
+  code_cleanup:
+    runs-on: ubuntu-latest
+    needs: ci
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run Code Cleanup job
+        uses: basantsd/laravel-ci-cd@v2.0.0
+        with:
+          job: 'code_cleanup'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repo: 'your-username/your-repo'
+
+  cd:
+    runs-on: ubuntu-latest
+    needs: code_cleanup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run CD job
+        uses: basantsd/laravel-ci-cd@v2.0.0
+        with:
+          job: 'cd'
+          vps_private_key: ${{ secrets.VPS_PRIVATE_KEY }}
+          vps_username: ${{ secrets.VPS_USERNAME }}
+          vps_host: ${{ secrets.VPS_HOST }}
+          deploy_path: '/path/to/deploy'
+          production_branch: 'main'
+          php_version: '8.0'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repo: 'your-username/your-repo'

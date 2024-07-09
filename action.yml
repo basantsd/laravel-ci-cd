@@ -1,52 +1,55 @@
-name: 'Laravel CI/CD Action'
-description: 'A custom GitHub Action for Laravel CI/CD'
+name: 'Laravel CI/CD'
+description: 'A GitHub Action to run Laravel CI/CD and code cleanup tasks'
 author: 'Basant Singh Dobal (sbasant12345@gmail.com)'
 inputs:
-  production-branch:
+  job:
+    description: 'The job type to run (ci, cd, code_cleanup)'
+    required: true
+  vps_private_key:
+    description: 'The private key for VPS'
+    required: false
+    default: ''
+  vps_username:
+    description: 'The username for VPS'
+    required: false
+    default: ''
+  vps_host:
+    description: 'The host for VPS'
+    required: false
+    default: ''
+  deploy_path:
+    description: 'The deployment path on VPS'
+    required: false
+    default: ''
+  production_branch:
     description: 'The production branch to deploy'
-    required: true
-    default: 'production'
-  vps-host:
-    description: 'VPS host'
-    required: true
-  vps-username:
-    description: 'VPS username'
-    required: true
-  vps-private-key:
-    description: 'VPS private key'
-    required: true
-  deploy-path:
-    description: 'Deployment path on the VPS'
-    required: true
-    default: '/var/www/html/project_name/'
-  php-version:
-    description: 'PHP version to use'
-    required: true
+    required: false
+    default: 'main'
+  php_version:
+    description: 'The PHP version to use'
+    required: false
     default: '8.0'
-outputs:
-  deployment-status:
-    description: 'The status of the deployment'
-    value: ${{ steps.deploy.outputs.status }}
+  github_token:
+    description: 'GitHub token to create issues'
+    required: true
+  repo:
+    description: 'GitHub repository in owner/repo format'
+    required: true
 runs:
   using: 'composite'
   steps:
-    - name: Set up job
-      run: |
-        case ${{ inputs.job }} in
-          ci)
-            ./entrypoint.sh ci
-            ;;
-          code_cleanup)
-            ./entrypoint.sh code_cleanup
-            ;;
-          cd)
-            ./entrypoint.sh cd
-            ;;
-          *)
-            echo "Invalid job"
-            exit 1
-            ;;
-        esac
+    - run: ./entrypoint.sh
+      shell: bash
+      env:
+        JOB: ${{ inputs.job }}
+        VPS_PRIVATE_KEY: ${{ inputs.vps_private_key }}
+        VPS_USERNAME: ${{ inputs.vps_username }}
+        VPS_HOST: ${{ inputs.vps_host }}
+        DEPLOY_PATH: ${{ inputs.deploy_path }}
+        PRODUCTION_BRANCH: ${{ inputs.production_branch }}
+        PHP_VERSION: ${{ inputs.php_version }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+        REPO: ${{ inputs.repo }}
 branding:
   icon: 'wind'
   color: 'blue'
