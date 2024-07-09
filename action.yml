@@ -58,15 +58,29 @@ runs:
                -d "{\"title\":\"CI/CD Action Failed\",\"body\":\"$message\"}"
         }
 
-        job=${{ inputs.job }}
+        capture_errors() {
+          local job=$1
+          local output_file=$2
+          if [ -f "$output_file" ]; then
+            local error_message=$(cat "$output_file")
+            create_github_issue "Job: $job failed.\n\nError Details:\n$error_message"
+          else
+            create_github_issue "Job: $job failed.\n\nCheck the logs for details."
+          fi
+        }
 
-        trap 'create_github_issue "Job: $job failed.\n\nCheck the logs for details."' ERR
+        job=${{ inputs.job }}
+        output_file="error_output.txt"
+
+        trap 'capture_errors "$job" "$output_file"' ERR
 
         if [ "$job" == "ci" ]; then
           # CI steps
           echo "Running CI steps..."
+          cp .env.example .env
+          php artisan key:generate
           composer install --prefer-dist --no-progress --no-interaction
-          php artisan test
+          php artisan test 2>&1 | tee "$output_file" || exit 1
 
         elif [ "$job" == "cd" ]; then
           # CD steps
@@ -82,7 +96,7 @@ runs:
           /usr/bin/php$PHP_VERSION $(which composer) install --no-dev --prefer-dist --optimize-autoloader && \
           /usr/bin/php$PHP_VERSION artisan optimize && \
           /usr/bin/php$PHP_VERSION artisan optimize:clear && \
-          /usr/bin/php$PHP_VERSION artisan storage:link"
+          /usr/bin/php$PHP_VERSION artisan storage:link" 2>&1 | tee "$output_file" || exit 1
 
         elif [ "$job" == "code_cleanup" ]; then
           # Code Cleanup steps
