@@ -78,14 +78,13 @@ runs:
           # CI steps
           echo "Running CI steps..."
           cp .env.example .env
-          php artisan key:generate
           composer install --prefer-dist --no-progress --no-interaction
+          php artisan key:generate
           php artisan test 2>&1 | tee "$output_file" || exit 1
 
         elif [ "$job" == "cd" ]; then
           # CD steps
           echo "Running CD steps..."
-          composer install --prefer-dist --no-progress --no-interaction
           ssh -o StrictHostKeyChecking=no -i $VPS_PRIVATE_KEY $VPS_USERNAME@$VPS_HOST \
           "cd $DEPLOY_PATH && \
           sudo chown -R $USER:www-data storage/ bootstrap/cache public/ && \
