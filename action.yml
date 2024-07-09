@@ -1,6 +1,6 @@
 name: 'Laravel CI/CD'
 description: 'A GitHub Action to run Laravel CI/CD and code cleanup tasks'
-author: 'Basant Singh Dobal (sbasant12345@gmail.com)'
+author: 'Your Name'
 inputs:
   job:
     description: 'The job type to run (ci, cd, code_cleanup)'
@@ -63,18 +63,17 @@ runs:
           # CD steps
           echo "Running CD steps..."
           composer install --prefer-dist --no-progress --no-suggest --no-interaction
-          ssh -o StrictHostKeyChecking=no -i $VPS_PRIVATE_KEY $VPS_USERNAME@$VPS_HOST << 'EOF'
-            cd $DEPLOY_PATH
-            sudo chown -R $USER:www-data storage/ bootstrap/cache public/
-            sudo chmod -R 775 storage bootstrap/cache public/
-            git reset --hard
-            git clean -fd
-            git pull origin $PRODUCTION_BRANCH
-            /usr/bin/php$PHP_VERSION $(which composer) install --no-dev --prefer-dist --optimize-autoloader
-            /usr/bin/php$PHP_VERSION artisan optimize
-            /usr/bin/php$PHP_VERSION artisan optimize:clear
-            /usr/bin/php$PHP_VERSION artisan storage:link
-          EOF
+          ssh -o StrictHostKeyChecking=no -i $VPS_PRIVATE_KEY $VPS_USERNAME@$VPS_HOST \
+          "cd $DEPLOY_PATH && \
+          sudo chown -R $USER:www-data storage/ bootstrap/cache public/ && \
+          sudo chmod -R 775 storage bootstrap/cache public/ && \
+          git reset --hard && \
+          git clean -fd && \
+          git pull origin $PRODUCTION_BRANCH && \
+          /usr/bin/php$PHP_VERSION $(which composer) install --no-dev --prefer-dist --optimize-autoloader && \
+          /usr/bin/php$PHP_VERSION artisan optimize && \
+          /usr/bin/php$PHP_VERSION artisan optimize:clear && \
+          /usr/bin/php$PHP_VERSION artisan storage:link"
 
         elif [ "$job" == "code_cleanup" ]; then
           # Code Cleanup steps
