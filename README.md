@@ -30,11 +30,8 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Run CI job
-        uses: basantsd/laravel-ci-cd@v2
+        uses: basantsd/laravel-ci-cd@clean
         with:
           job: 'ci'
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -44,11 +41,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: ci
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Run Code Cleanup job
-        uses: basantsd/laravel-ci-cd@v2
+        uses: basantsd/laravel-ci-cd@clean
         with:
           job: 'code_cleanup'
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -58,11 +52,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: code_cleanup
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
       - name: Run CD job
-        uses: basantsd/laravel-ci-cd@v2
+        uses: basantsd/laravel-ci-cd@clean
         with:
           job: 'cd'
           vps_private_key: ${{ secrets.VPS_PRIVATE_KEY }}
@@ -70,6 +61,6 @@ jobs:
           vps_host: ${{ secrets.VPS_HOST }}
           deploy_path: '/path/to/deploy'
           production_branch: 'main'
-          php_version: '8.0'
+          php_version: '8.2'
           github_token: ${{ secrets.GITHUB_TOKEN }}
           repo: 'your-username/your-repo'

@@ -1,6 +1,6 @@
 name: 'Laravel CI/CD'
 description: 'A GitHub Action to run Laravel CI/CD and code cleanup tasks'
-author: 'Your Name'
+author: 'Basant Singh Dobal (sbasant12345@gmail.com)'
 inputs:
   job:
     description: 'The job type to run (ci, cd, code_cleanup)'
@@ -28,7 +28,7 @@ inputs:
   php_version:
     description: 'The PHP version to use'
     required: false
-    default: '8.0'
+    default: '8.2'
   github_token:
     description: 'GitHub token to create issues'
     required: true
@@ -38,6 +38,15 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php_version }}
+        tools: composer
+
     - run: |
         set -e
 
@@ -56,13 +65,13 @@ runs:
         if [ "$job" == "ci" ]; then
           # CI steps
           echo "Running CI steps..."
-          composer install --prefer-dist --no-progress --no-suggest --no-interaction
+          composer install --prefer-dist --no-progress --no-interaction
           php artisan test
 
         elif [ "$job" == "cd" ]; then
           # CD steps
           echo "Running CD steps..."
-          composer install --prefer-dist --no-progress --no-suggest --no-interaction
+          composer install --prefer-dist --no-progress --no-interaction
           ssh -o StrictHostKeyChecking=no -i $VPS_PRIVATE_KEY $VPS_USERNAME@$VPS_HOST \
           "cd $DEPLOY_PATH && \
           sudo chown -R $USER:www-data storage/ bootstrap/cache public/ && \
@@ -78,7 +87,7 @@ runs:
         elif [ "$job" == "code_cleanup" ]; then
           # Code Cleanup steps
           echo "Running code cleanup steps..."
-          composer install --prefer-dist --no-progress --no-suggest --no-interaction
+          composer install --prefer-dist --no-progress --no-interaction
           composer require --dev laravel/pint
           composer require --dev squizlabs/php_codesniffer
           npm install
