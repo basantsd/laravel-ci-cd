@@ -23,12 +23,10 @@ inputs:
     default: ''
   production_branch:
     description: 'The production branch to deploy'
-    required: false
-    default: 'main'
+    required: true
   php_version:
     description: 'The PHP version to use'
-    required: false
-    default: '8.2'
+    required: true
   github_token:
     description: 'GitHub token to create issues'
     required: true
@@ -123,7 +121,7 @@ runs:
         VPS_HOST: ${{ inputs.vps_host }}
         DEPLOY_PATH: ${{ inputs.deploy_path }}
         PRODUCTION_BRANCH: ${{ inputs.production_branch }}
-        PHP_VERSION: ${{ inputs.php_version }}
+        PHP_VERSION: ${{ inputs.php_version }}  # Use dynamic PHP version
         GITHUB_TOKEN: ${{ inputs.github_token }}
         REPO: ${{ inputs.repo }}
 branding:
