@@ -31,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run CI job
-        uses: basantsd/laravel-ci-cd@v2
+        uses: basantsd/laravel-ci-cd@m1
         with:
           job: 'ci'
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -42,7 +42,7 @@ jobs:
     needs: ci
     steps:
       - name: Run Code Cleanup job
-        uses: basantsd/laravel-ci-cd@v2
+        uses: basantsd/laravel-ci-cd@m1
         with:
           job: 'code_cleanup'
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -53,7 +53,7 @@ jobs:
     needs: code_cleanup
     steps:
       - name: Run CD job
-        uses: basantsd/laravel-ci-cd@v2
+        uses: basantsd/laravel-ci-cd@m1
         with:
           job: 'cd'
           vps_private_key: ${{ secrets.VPS_PRIVATE_KEY }}
